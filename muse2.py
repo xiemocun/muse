@@ -40,13 +40,15 @@ def h(seed: str, n: int) -> int:
     return int.from_bytes(hashlib.sha256(seed.encode()).digest()[:4], "big") % n
 
 
-def build(problem: str) -> dict:
+def build(problem: str, domain_offset: int = 0) -> dict:
     s = problem.strip().lower()
     a = ATTRS[h(s + "a", len(ATTRS))]
     b = ATTRS[h(s + "b", len(ATTRS))]
     if b == a:
         b = ATTRS[(ATTRS.index(a) + 3) % len(ATTRS)]
-    far, note = FAR[h(s + "f", len(FAR))]
+    # 单次调用由哈希决定（可复现）；成批调用传 domain_offset 轮转，
+    # 否则哈希会把多个问题挤到同一个远域上（measure.py 实测 8 个问题 4 个撞车）。
+    far, note = FAR[(h(s + "f", len(FAR)) + domain_offset) % len(FAR)]
 
     cands = []
     for name, tpl in OPERATORS:
