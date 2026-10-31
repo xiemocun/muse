@@ -94,8 +94,12 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("problem", nargs="+")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--no-verify", action="store_true",
+                    help="探索模式：不做可证伪检查（会放过审美类、不可验证类灵感）")
     a = ap.parse_args()
     r = build(" ".join(a.problem))
+    if a.no_verify:
+        r["可验证"] = ["（探索模式：本条已关闭。可证伪是工程筛子，不是通用的创意标准）"]
     print(json.dumps(r, ensure_ascii=False, indent=1) if a.json else render(r))
 
 
