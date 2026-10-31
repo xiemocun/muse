@@ -96,7 +96,13 @@ def main() -> None:
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--no-verify", action="store_true",
                     help="探索模式：不做可证伪检查（会放过审美类、不可验证类灵感）")
+    ap.add_argument("--domains", default=None,
+                    help='JSON 文件，替换内置远域表：[{"name": "...", "note": "..."}]')
     a = ap.parse_args()
+    if a.domains:
+        global FAR
+        data = json.load(open(a.domains, encoding="utf-8"))
+        FAR = [(d["name"], d["note"]) for d in data]
     r = build(" ".join(a.problem))
     if a.no_verify:
         r["可验证"] = ["（探索模式：本条已关闭。可证伪是工程筛子，不是通用的创意标准）"]
