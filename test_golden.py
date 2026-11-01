@@ -24,6 +24,24 @@ def test_golden_mapping_is_pinned():
         assert r["远域"]["领域"] == domain, (problem, r["远域"]["领域"])
 
 
+def test_render_shows_both_attributes_separately():
+    """render 必须把两个属性分别打出来；索引写错会变成同一个属性出现两次。"""
+    r = muse2.build("副业怎么定价")
+    text = muse2.render(r)
+    a, b = r["属性"]
+    assert f"属性标签：{a} / {b}" in text, text[:120]
+    assert text.count(a) >= 1 and text.count(b) >= 1
+    # 两个属性必须真的是两个不同的字符串，而不是同一个下标取了两遍
+    assert a != b
+
+
+def test_render_includes_all_four_operators():
+    r = muse2.build("副业怎么定价")
+    text = muse2.render(r)
+    for name in ("类比迁移", "矛盾缝合", "降维抽象", "反转因果"):
+        assert name in text, name
+
+
 def test_attributes_are_never_equal():
     """b == a 的那条分支必须真的存在，并且真的被走到过。"""
     for p in ("副业怎么定价", "我想找个能赚钱的副业", "测试" * 40):
